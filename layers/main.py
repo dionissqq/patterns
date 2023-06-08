@@ -1,3 +1,6 @@
+import unittest
+
+
 # Layer 1: Presentation Layer
 class GameController:
     def __init__(self, game_service):
@@ -47,13 +50,26 @@ class Game:
         self.score = 0
 
 
-# Usage
-if __name__ == '__main__':
-    # Create instances of the layers
-    repository = GameRepository()
-    service = GameService(repository)
-    controller = GameController(service)
+# Unit Tests
+class GameControllerTest(unittest.TestCase):
+    def setUp(self):
+        repository = GameRepository()
+        service = GameService(repository)
+        self.controller = GameController(service)
 
-    # Use the controller to start a new game
-    result = controller.start_game("Alice")
-    print(result)
+    def test_start_game_with_valid_player_name(self):
+        result = self.controller.start_game("Alice")
+        self.assertTrue("Game started!" in result)
+        self.assertTrue("ID:" in result)
+
+    def test_start_game_with_empty_player_name(self):
+        result = self.controller.start_game("")
+        self.assertEqual(result, "Please enter a player name.")
+
+    def test_start_game_with_no_player_name(self):
+        result = self.controller.start_game(None)
+        self.assertEqual(result, "Please enter a player name.")
+
+
+if __name__ == '__main__':
+    unittest.main()
