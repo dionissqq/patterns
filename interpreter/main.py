@@ -1,3 +1,6 @@
+import unittest
+
+
 class Context:
     def __init__(self):
         self.input = ""
@@ -35,21 +38,31 @@ class CapitalizeExpression(Expression):
         context.set_output(capitalized_text)
 
 
-# Usage
+class InterpreterTest(unittest.TestCase):
+    def test_reverse_expression(self):
+        context = Context()
+        input_text = "Hello, World!"
+        expected_output = "!dlroW ,olleH"
+
+        context.set_input(input_text)
+        reverse_expression = ReverseExpression()
+        reverse_expression.interpret(context)
+        actual_output = context.get_output()
+
+        self.assertEqual(actual_output, expected_output)
+
+    def test_capitalize_expression(self):
+        context = Context()
+        input_text = "Hello, World!"
+        expected_output = "HELLO, WORLD!"
+
+        context.set_input(input_text)
+        capitalize_expression = CapitalizeExpression()
+        capitalize_expression.interpret(context)
+        actual_output = context.get_output()
+
+        self.assertEqual(actual_output, expected_output)
+
+
 if __name__ == '__main__':
-    context = Context()
-
-    # Set the input text
-    context.set_input("Hello, World!")
-
-    # Use the ReverseExpression to reverse the input
-    reverse_expression = ReverseExpression()
-    reverse_expression.interpret(context)
-    reverse_output = context.get_output()
-    print(reverse_output)  # Output: "!dlroW ,olleH"
-
-    # Use the CapitalizeExpression to capitalize the input
-    capitalize_expression = CapitalizeExpression()
-    capitalize_expression.interpret(context)
-    capitalize_output = context.get_output()
-    print(capitalize_output)  # Output: "!DLROW ,OLLEH"
+    unittest.main()
