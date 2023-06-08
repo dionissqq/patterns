@@ -1,4 +1,5 @@
 import random
+import unittest
 
 
 class Blackboard:
@@ -36,40 +37,30 @@ class Solver:
     def _solve_recommendation_problem(self):
         recommendations = ["Book", "Movie", "Restaurant"]
         recommendation = random.choice(recommendations)
+        print(recommendation)
         self.blackboard.add_knowledge("recommendation", recommendation)
 
 
-# Usage
+class SolverTest(unittest.TestCase):
+    def setUp(self):
+        self.blackboard = Blackboard()
+        self.solver = Solver(self.blackboard)
+
+    def test_solve_weather_problem(self):
+        problem = Problem("What's the current weather?")
+        self.solver.solve_problem(problem)
+        temperature = self.blackboard.get_knowledge("temperature")
+        self.assertIsNotNone(temperature)
+        self.assertGreaterEqual(temperature, 20)
+        self.assertLessEqual(temperature, 40)
+
+    def test_solve_recommendation_problem(self):
+        problem = Problem("Can you recommend something to do?")
+        self.solver.solve_problem(problem)
+        print(self.blackboard.knowledge)
+        recommendation = self.blackboard.get_knowledge("recommendation")
+        self.assertEqual(recommendation, None)
+
+
 if __name__ == '__main__':
-    # Create an instance of the Blackboard
-    blackboard = Blackboard()
-
-    # Create an instance of the Solver with the Blackboard
-    solver = Solver(blackboard)
-
-    # Add some knowledge to the Blackboard
-    blackboard.add_knowledge("location", "New York")
-
-    # Define a weather problem
-    weather_problem = Problem("What's the current weather?")
-
-    # Solve the weather problem using the Solver
-    solver.solve_problem(weather_problem)
-
-    # Retrieve the temperature from the Blackboard
-    temperature = blackboard.get_knowledge("temperature")
-
-    # Print the temperature
-    print("Temperature in New York:", temperature)
-
-    # Define a recommendation problem
-    recommendation_problem = Problem("Can you recommend something to do?")
-
-    # Solve the recommendation problem using the Solver
-    solver.solve_problem(recommendation_problem)
-
-    # Retrieve the recommendation from the Blackboard
-    recommendation = blackboard.get_knowledge("recommendation")
-
-    # Print the recommendation
-    print("Recommendation:", recommendation)
+    unittest.main()
