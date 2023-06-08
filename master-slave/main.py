@@ -1,6 +1,7 @@
 import time
 import threading
 import random
+import unittest
 
 
 # Master
@@ -74,14 +75,18 @@ class Slave:
         return self.task_completed
 
 
-# Usage
+# Unit Tests
+class MasterSlaveTest(unittest.TestCase):
+    def test_master_start_processing(self):
+        slave1 = Slave("Slave 1")
+        slave2 = Slave("Slave 2")
+
+        master = Master([slave1, slave2])
+        master.start_processing()
+
+        self.assertTrue(slave1.is_task_completed())
+        self.assertTrue(slave2.is_task_completed())
+
+
 if __name__ == '__main__':
-    # Create slaves
-    slave1 = Slave("Slave 1")
-    slave2 = Slave("Slave 2")
-
-    # Create the master and assign slaves
-    master = Master([slave1, slave2])
-
-    # Start processing tasks
-    master.start_processing()
+    unittest.main()
