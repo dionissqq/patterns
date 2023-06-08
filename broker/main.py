@@ -1,4 +1,5 @@
 import time
+import unittest
 
 
 # Broker
@@ -13,54 +14,52 @@ class Broker:
 
     def publish(self, topic, message):
         if topic in self.subscribers:
-            print(f"Broker: Publishing message '{message}' on topic '{topic}'")
             for subscriber in self.subscribers[topic]:
                 subscriber.receive_message(topic, message)
-            print("")
 
 
 # Subscriber
 class Subscriber:
     def __init__(self, name):
         self.name = name
+        self.received_messages = []
 
     def receive_message(self, topic, message):
-        print(f"{self.name}: Received message '{message}' on topic '{topic}'")
+        self.received_messages.append((topic, message))
 
 
-# Usage
+# Unit Tests
+class BrokerTest(unittest.TestCase):
+    def test_broker_publish_single_subscriber(self):
+        broker = Broker()
+        subscriber = Subscriber("Alice")
+        broker.subscribe("news", subscriber)
+
+        message = "Breaking news: New discovery!"
+        broker.publish("news", message)
+
+        self.assertEqual(len(subscriber.received_messages), 1)
+        self.assertEqual(subscriber.received_messages[0][0], "news")
+        self.assertEqual(subscriber.received_messages[0][1], message)
+
+    def test_broker_publish_multiple_subscribers(self):
+        broker = Broker()
+        subscriber1 = Subscriber("Alice")
+        subscriber2 = Subscriber("Bob")
+        broker.subscribe("news", subscriber1)
+        broker.subscribe("news", subscriber2)
+
+        message = "Breaking news: New discovery!"
+        broker.publish("news", message)
+
+        self.assertEqual(len(subscriber1.received_messages), 1)
+        self.assertEqual(subscriber1.received_messages[0][0], "news")
+        self.assertEqual(subscriber1.received_messages[0][1], message)
+
+        self.assertEqual(len(subscriber2.received_messages), 1)
+        self.assertEqual(subscriber2.received_messages[0][0], "news")
+        self.assertEqual(subscriber2.received_messages[0][1], message)
+
+
 if __name__ == '__main__':
-    broker = Broker()
-
-    # Create subscribers
-    subscriber1 = Subscriber("Alice")
-    subscriber2 = Subscriber("Bob")
-    subscriber3 = Subscriber("Charlie")
-
-    # Subscribe subscribers to topics
-    broker.subscribe("news", subscriber1)
-    broker.subscribe("news", subscriber2)
-    broker.subscribe("sports", subscriber2)
-    broker.subscribe("weather", subscriber3)
-
-    # Publish messages to topics
-    broker.publish("news", "Breaking news: New discovery!")
-    time.sleep(1)
-    broker.publish("sports", "Goal! The home team takes the lead.")
-    time.sleep(1)
-    broker.publish("weather", "Sunny skies expected tomorrow.")
-
-    # Unsubscribe a subscriber
-    broker.subscribers["news"].remove(subscriber2)
-
-    # Publish message after unsubscribe
-    time.sleep(1)
-    broker.publish("news", "Important announcement!")
-
-    # Subscribe a new subscriber
-    subscriber4 = Subscriber("Eve")
-    broker.subscribe("news", subscriber4)
-
-    # Publish message after new subscription
-    time.sleep(1)
-    broker.publish("news", "Latest update: Event rescheduled")
+    unittest.main()
