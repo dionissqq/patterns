@@ -1,5 +1,7 @@
 import socket
 import threading
+import unittest
+
 
 # Server
 class Server:
@@ -64,20 +66,29 @@ class Client:
         self.client_socket.close()
 
 
-# Usage
+# Unit Tests
+class ServerClientTest(unittest.TestCase):
+    def setUp(self):
+        server = Server("localhost", 3001)
+        server_thread = threading.Thread(target=server.start)
+        server_thread.start()
+
+        self.client = Client("localhost", 3001)
+        self.client.connect()
+
+        self.server_thread = server_thread
+
+    def tearDown(self):
+        self.client.disconnect()
+        self.server_thread.join()
+
+    def test_send_message(self):
+        message = "Hello, server!"
+        self.client.send_message(message)
+        # The server should echo the message back
+        expected_response = message
+        self.assertEqual(self.client.client_socket.recv(1024).decode("utf-8"), expected_response)
+
+
 if __name__ == '__main__':
-    # Start the server
-    server = Server("localhost", 3001)
-    server_thread = threading.Thread(target=server.start)
-    server_thread.start()
-
-    # Connect a client and send a message
-    client = Client("localhost", 3001)
-    client.connect()
-    client.send_message("Hello, server!")
-
-    # Disconnect the client
-    client.disconnect()
-
-    # Wait for the server thread to finish
-    server_thread.join()
+    unittest.main()
