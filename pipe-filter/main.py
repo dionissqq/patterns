@@ -1,4 +1,5 @@
 import random
+import unittest
 
 
 # Filter
@@ -39,17 +40,21 @@ class Pipe:
         return data
 
 
+# Unit Tests
+class PipeFilterTest(unittest.TestCase):
+    def test_pipe_filter(self):
+        pipe = Pipe()
+
+        pipe.add_filter(FilterUpperCase())
+        pipe.add_filter(FilterReverse())
+        pipe.add_filter(FilterShuffle())
+
+        data = "Pipe-Filter Pattern"
+        result = pipe.process_data(data)
+
+        expected_result = ''.join(random.sample(data[::-1].upper(), len(data)))
+        self.assertEqual(result, expected_result)
+
+
 if __name__ == '__main__':
-    pipe = Pipe()
-
-    # Create and add filters to the pipe
-    pipe.add_filter(FilterUpperCase())
-    pipe.add_filter(FilterReverse())
-    pipe.add_filter(FilterShuffle())
-
-    # Process data through the pipe
-    data = "Pipe-Filter Pattern"
-    result = pipe.process_data(data)
-
-    print(f"Input data: {data}")
-    print(f"Output data: {result}")
+    unittest.main()
