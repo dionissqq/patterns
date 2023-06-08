@@ -1,4 +1,6 @@
-import random
+import unittest
+from unittest.mock import patch
+from io import StringIO
 
 
 class Model:
@@ -18,7 +20,6 @@ class Model:
 
 class View:
     def render(self, data):
-        print("View - Displaying data:")
         for item in data:
             print("- " + str(item))
 
@@ -41,19 +42,30 @@ class Controller:
         self.view.render(data)
 
 
-# Usage
+class ControllerTest(unittest.TestCase):
+    def setUp(self):
+        self.model = Model()
+        self.view = View()
+        self.controller = Controller(self.model, self.view)
+
+    def test_add_item(self):
+        self.controller.add_item("Apple")
+        self.assertEqual(self.model.get_data(), ["Apple"])
+
+    def test_remove_item(self):
+        self.model.add_data("Apple")
+        self.model.add_data("Banana")
+        self.controller.remove_item("Apple")
+        self.assertEqual(self.model.get_data(), ["Banana"])
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_update_view(self, mock_stdout):
+        self.model.add_data("Apple")
+        self.model.add_data("Banana")
+        self.controller.update_view()
+        expected_output = "- Apple\n- Banana\n"
+        self.assertEqual(mock_stdout.getvalue(), expected_output)
+
+
 if __name__ == '__main__':
-    # Create instances of Model, View, and Controller
-    model = Model()
-    view = View()
-    controller = Controller(model, view)
-
-    # Add random items to the model
-    items = ["Apple", "Banana", "Orange", "Grape", "Mango"]
-    for _ in range(5):
-        random_item = random.choice(items)
-        controller.add_item(random_item)
-
-    # Remove an item from the model
-    item_to_remove = random.choice(model.get_data())
-    controller.remove_item(item_to_remove)
+    unittest.main()
